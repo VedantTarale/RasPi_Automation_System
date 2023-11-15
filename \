@@ -8,10 +8,12 @@ bmp = 0x76
 NodeMCU = 0x12
 
 pump = 23#16
+receive = 25#22
 
 GPIO.cleanup()
 #GPIO.setmode(GPIO.BOARD)
 GPIO.setup(pump, GPIO.OUT)
+GPIO.setup(receive, GPIO.IN)
 
 def initialize():
     print("I2C Devices Found:", [hex(i) for i in i2c.scan()])
@@ -140,15 +142,19 @@ def pump_water():
     GPIO.output(pump,GPIO.LOW)
     get_NodeMCU_Reading()
     xyz = input()
+    print("pin 16 state: ", GPIO.input(receive))
     print("water value: ", water_reading)
     xyz = input()
     while (final_val - water_reading) > margin:
         print("water level: ", water_reading)
         GPIO.output(pump,GPIO.HIGH)
+        print("pin 16 state: ", GPIO.input(receive))
         #xyz = input()
         get_NodeMCU_Reading()
     print("done")
     GPIO.output(pump,GPIO.LOW)
+    GPIO.output(pump, GPIO.LOW)
+    print("pin 16 state: ", GPIO.input(receive))
 
 def get_reading():
     #calibration_data = calibrate()
