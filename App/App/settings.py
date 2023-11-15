@@ -31,6 +31,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'reading',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -67,16 +69,19 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'App.wsgi.application'
+# WSGI_APPLICATION = 'App.wsgi.application'
+ASGI_APPLICATION = 'App.asgi.application'
 
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('db_name'),
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': os.environ.get('db_name'),
 	'USER': os.environ.get('db_username'),
 	'PASSWORD': os.environ.get('db_password'),
 	'HOST': 'localhost',
