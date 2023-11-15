@@ -12,19 +12,29 @@ class Reading(models.Model):
 
     def __str__(self):
         return str(self.temperature_data) +str(self.pressure_data) + str(self.moisture_data)
-
+    
+    def to_dict(self):
+        # Convert the model instance to a dictionary
+        data = {
+            'id': self.id,
+            'temp': self.temperature_data,
+            'pressure': self.pressure_data,
+            'moisture': self.moisture_data,
+            'time': self.created_at.isoformat(),
+        }
+        return data
+    
     def save(self, *args, **kwargs):
         if not self.id:
             self.created_at = timezone.now()
+        super(Reading, self).save(*args, **kwargs)
+
         channel_layer = get_channel_layer()
-        # objs = Reading.objects.all()
-        data = {'temp':self.temperature_data, 'pressure': self.pressure_data, 'moisture': self.moisture_data, 'time': self.created_at.isoformat()}
-        print("FU")
+        objs = Reading.objects.order_by('-created_at').reverse()[:100]
+        data = [reading.to_dict() for reading in objs]
         async_to_sync(channel_layer.group_send)(
             'test_consumer_group', {
                 'type':'send_update',
                 'value': data
             }
         )
-        
-        super(Reading, self).save(*args, **kwargs)
