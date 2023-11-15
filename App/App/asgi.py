@@ -11,15 +11,15 @@ import os
 
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
-from django.urls import path
-from reading.consumers import ReadingConsumer
+from channels.auth import AuthMiddlewareStack
+import reading.routing
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'App.settings')
-
-ws_patterns = [
-    path('reading/', ReadingConsumer.as_asgi())
-]
 
 application = ProtocolTypeRouter({
     'http' : get_asgi_application(),
-    'websocket' : URLRouter(ws_patterns) 
+    'websocket' : AuthMiddlewareStack(
+        URLRouter(
+            reading.routing.websocket_urlpatterns
+        ) 
+    )
 })

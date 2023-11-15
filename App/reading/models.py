@@ -1,9 +1,10 @@
 from django.db import models
 from django.utils import timezone
-
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+import json
 # Create your models here.
 class Reading(models.Model):
-
     temperature_data = models.FloatField(null=False)
     pressure_data = models.FloatField(null=False)
     moisture_data = models.FloatField(null=False)
@@ -15,4 +16,15 @@ class Reading(models.Model):
     def save(self, *args, **kwargs):
         if not self.id:
             self.created_at = timezone.now()
-        return super(Reading, self).save(*args, **kwargs)
+        channel_layer = get_channel_layer()
+        # objs = Reading.objects.all()
+        data = {'temp':self.temperature_data, 'pressure': self.pressure_data, 'moisture': self.moisture_data, 'time': self.created_at.isoformat()}
+        print("FU")
+        async_to_sync(channel_layer.group_send)(
+            'test_consumer_group', {
+                'type':'send_update',
+                'value': data
+            }
+        )
+        
+        super(Reading, self).save(*args, **kwargs)
