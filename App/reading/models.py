@@ -8,10 +8,11 @@ class Reading(models.Model):
     temperature_data = models.FloatField(null=False)
     pressure_data = models.FloatField(null=False)
     moisture_data = models.FloatField(null=False)
+    motor_status = models.BooleanField(null=False, default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.temperature_data) +str(self.pressure_data) + str(self.moisture_data)
+        return str(self.temperature_data) +str(self.pressure_data) + str(self.moisture_data) + str(self.motor_status)
     
     def to_dict(self):
         # Convert the model instance to a dictionary
@@ -20,6 +21,7 @@ class Reading(models.Model):
             'temp': self.temperature_data,
             'pressure': self.pressure_data,
             'moisture': self.moisture_data,
+            'motor': self.motor_status,
             'time': self.created_at.isoformat(),
         }
         return data

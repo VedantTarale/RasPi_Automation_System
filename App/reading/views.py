@@ -16,7 +16,8 @@ def add_reading(request):
         reading_instance = Reading(
             temperature_data=json_data['temp'],
             pressure_data=json_data['pressure'],
-            moisture_data=json_data['moisture']
+            moisture_data=json_data['moisture'],
+            motor_status=json_data['motor']
         )
         try:
             reading_instance.save()
