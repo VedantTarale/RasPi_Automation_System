@@ -1,0 +1,35 @@
+body {
+    height: 100%;
+    min-height: 100vh;
+    background: linear-gradient(to bottom right, #010318, #050505);
+}
+
+h1 {
+    color: aliceblue;
+    /* font-family: 'Courier New', Courier, monospace; */
+    font-weight: 900;
+    font-variant: small-caps;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.chartbox {
+    padding: 5px;
+    border-radius: 30px;
+    transition: all 0.25s ease;
+
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.chartbox:hover {
+    border: 1px solid aliceblue;
+    transform: translate(-2px, 2px);
+    transition-delay: 0.1s;
+}
+
+.chart-div {
+    margin-top: 15px;
+}

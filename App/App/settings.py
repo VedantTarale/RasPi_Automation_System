@@ -75,8 +75,8 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'App.wsgi.application'
 ASGI_APPLICATION = 'App.asgi.application'
 
-STATIC_URL = 'staticfiles/'
-STATIC_ROOT = BASE_DIR /"staticfiles/"
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "staticfiles/"
 
 CHANNEL_LAYERS = {
     'default': {

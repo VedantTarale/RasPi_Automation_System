@@ -30,7 +30,7 @@ class Reading(models.Model):
         super(Reading, self).save(*args, **kwargs)
 
         channel_layer = get_channel_layer()
-        objs = Reading.objects.order_by('-created_at').reverse()[:100]
+        objs = Reading.objects.order_by('-created_at')[:10][::-1]
         data = [reading.to_dict() for reading in objs]
         async_to_sync(channel_layer.group_send)(
             'test_consumer_group', {
