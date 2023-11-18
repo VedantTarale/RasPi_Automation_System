@@ -19,7 +19,6 @@ GPIO.setup(pump, GPIO.OUT)
 
 def initialize():
     print("I2C Devices Found:", [hex(i) for i in i2c.scan()])
-    xyz = input()
     if bmp not in i2c.scan():
         print("BMP280 Sensor Not Found")
         sys.exit()
@@ -82,7 +81,6 @@ def get_bmp_reading():
     global temperature
     temperature = (t_fine / 5120.0)  # Temperature in degrees Celsius
 
-    print("Temp: " + str(round(temperature,2)) + " ºC",end="\t")
 
 
     i2c.writeto(bmp,bytes([0xF7]), stop=False)
@@ -126,7 +124,6 @@ def get_bmp_reading():
         var1 = (dig_P9 * pressure * pressure) / 2147483648.0
         var2 = pressure * (dig_P8 / 32768.0)
         pressure = pressure + ((var1 + var2 + dig_P7) / 16.0)
-    print("Pressure: " + str(round(pressure,2)) + " hPa")
 
 def get_NodeMCU_Reading():
     i2c.writeto(NodeMCU,bytes([0x0]), stop=False)
@@ -135,7 +132,6 @@ def get_NodeMCU_Reading():
 
     global water_reading
     water_reading = 255 - int.from_bytes(result, "big")
-    print("value: ", water_reading)
     time.sleep(1)
 
 def pump_water():
@@ -146,14 +142,13 @@ def pump_water():
     final_val = 200 #to be modified later
     margin = 5 #to be modified later
     GPIO.output(pump,GPIO.LOW)
-    get_NodeMCU_Reading()
-    # xyz = input()
     print("water value: ", water_reading)
-    # xyz = input()
-    while (final_val - water_reading) > margin:
-        print("water level: ", water_reading)
+    if (final_val - water_reading) > margin:
+        print("Water: ", water_reading)
+        print("Temp: ",temperature)
+        print("Pressure: ",pressure)
+        print()
         GPIO.output(pump,GPIO.HIGH)
-        
         # Post data to Django Server
         data = {
             "temp": temperature,
@@ -162,28 +157,24 @@ def pump_water():
             "motor": 1
         }
         response = requests.post(url, json=data)
-         
-            
-        get_NodeMCU_Reading()
-    print("done")
-    GPIO.output(pump,GPIO.LOW)
+    else:
+        GPIO.output(pump,GPIO.LOW)
     
-    # Post data to Django Server
-    data = {
-            "temp": temperature,
-            "pressure": pressure,
-            "moisture": water_reading,
-            "motor": 0
-        }
-    response = requests.post(url, json=data)
+        # Post data to Django Server
+        data = {
+                "temp": temperature,
+                "pressure": pressure,
+                "moisture": water_reading,
+                "motor": 0
+            }
+        response = requests.post(url, json=data)
     
 def get_reading():
-    get_bmp_reading()
-    get_NodeMCU_Reading()
-    
+    while True:
+        get_bmp_reading()
+        get_NodeMCU_Reading()
+        pump_water()
 
 if __name__ == "__main__":
     initialize()
     get_reading()
-    time.sleep(1)
-    pump_water()
