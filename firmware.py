@@ -3,11 +3,15 @@ import RPi.GPIO as GPIO
 import board
 import busio
 import time
+import requests
+
+
+url = "http://localhost:8000/add_reading/"
 i2c = busio.I2C(board.SCL, board.SDA)
 bmp = 0x76
 NodeMCU = 0x12
 
-pump = 23#16
+pump = 23 #16
 
 GPIO.cleanup()
 #GPIO.setmode(GPIO.BOARD)
@@ -75,6 +79,7 @@ def get_bmp_reading():
     var2 = ((raw_temperature / 131072.0 - dig_T1 / 8192.0) ** 2) * dig_T3
     t_fine = var1 + var2
 
+    global temperature
     temperature = (t_fine / 5120.0)  # Temperature in degrees Celsius
 
     print("Temp: " + str(round(temperature,2)) + " ºC",end="\t")
@@ -112,6 +117,7 @@ def get_bmp_reading():
     var1 = ((dig_P3 * var1 * var1) / 524288.0) + (dig_P2 * var1)
     var1 = ((1.0 + (var1 / 32768.0)) * dig_P1)
 
+    global pressure
     if var1 == 0:
         pressure = 0  # Avoid division by zero
     else:
@@ -130,28 +136,48 @@ def get_NodeMCU_Reading():
     global water_reading
     water_reading = 255 - int.from_bytes(result, "big")
     print("value: ", water_reading)
-    #print("value: ", int.from_bytes(result, "big"))
     time.sleep(1)
 
 def pump_water():
     global water_reading
+    global temperature
+    global pressure
+    
     final_val = 200 #to be modified later
     margin = 5 #to be modified later
     GPIO.output(pump,GPIO.LOW)
     get_NodeMCU_Reading()
-    xyz = input()
+    # xyz = input()
     print("water value: ", water_reading)
-    xyz = input()
+    # xyz = input()
     while (final_val - water_reading) > margin:
         print("water level: ", water_reading)
         GPIO.output(pump,GPIO.HIGH)
-        #xyz = input()
+        
+        # Post data to Django Server
+        data = {
+            "temp": temperature,
+            "pressure": pressure,
+            "moisture": water_reading,
+            "motor": 1
+        }
+        response = requests.post(url, json=data)
+         
+            
         get_NodeMCU_Reading()
     print("done")
     GPIO.output(pump,GPIO.LOW)
-
+    
+    # Post data to Django Server
+    data = {
+            "temp": temperature,
+            "pressure": pressure,
+            "moisture": water_reading,
+            "motor": 0
+        }
+    response = requests.post(url, json=data)
+    
 def get_reading():
-    #calibration_data = calibrate()
     get_bmp_reading()
     get_NodeMCU_Reading()
     
@@ -161,4 +187,3 @@ if __name__ == "__main__":
     get_reading()
     time.sleep(1)
     pump_water()
-##	calibrate()
