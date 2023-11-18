@@ -1,3 +1,16 @@
+scales_settings={
+    x: {
+        ticks: {
+            color: 'white' // Change the color of x-axis labels
+        }
+    },
+    y: {
+        ticks: {
+            beginAtZero: true,
+            color: 'white' // Change the color of y-axis labels
+        }
+    }
+}
 var temp_data = {
     type: 'line',
     data: {
@@ -11,11 +24,7 @@ var temp_data = {
         ]
     },
     options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+        scales: scales_settings,
     }
 }
 
@@ -32,11 +41,7 @@ var pressure_data = {
         ]
     },
     options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+        scales: scales_settings
     }
 }
 
@@ -53,11 +58,7 @@ var moisture_data = {
         ]
     },
     options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+        scales: scales_settings
     }
 }
 
@@ -74,11 +75,7 @@ var motor_data = {
         ]
     },
     options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+        scales: scales_settings
     }
 }
 
@@ -117,7 +114,7 @@ socket.onmessage = function (e) {
     pressure_data.data.labels = time
     moisture_data.data.labels = time
     motor_data.data.labels = time
-    
+
     temp_data.data.datasets[0].data = temp_vals
     pressure_data.data.datasets[0].data = pressure_vals
     moisture_data.data.datasets[0].data = moisture_vals
