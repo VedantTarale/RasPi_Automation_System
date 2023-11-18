@@ -189,8 +189,12 @@ def get_reading():
         get_bmp_reading()
         get_NodeMCU_Reading()
         pump_water()
-        time.sleep(1.5)
+        time.sleep(0.5)
 
 if __name__ == "__main__":
-    initialize()
-    get_reading()
+    try:
+        initialize()
+        get_reading()
+    except KeyboardInterrupt:
+        GPIO.output(pump,GPIO.LOW)
+        sys.exit()
